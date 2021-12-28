@@ -47,7 +47,7 @@ class GetBookSearchUseCase(
             //5xx - responses
             emit(Resource.Error(e.localizedMessage ?: "An unexpected error occurred"))
         } catch (e: Exception) {
-            emit(Resource.Error(e.localizedMessage ?: "An unexpected error occurred"))
+            emit(Resource.Error("Not results found." ?: "An unexpected error occurred"))
         }
     }
 }

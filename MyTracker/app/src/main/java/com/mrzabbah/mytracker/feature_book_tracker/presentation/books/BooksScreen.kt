@@ -11,7 +11,9 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -19,8 +21,11 @@ import androidx.navigation.NavController
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.common.BookItem
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.books.components.FilterSection
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.books.components.OrderSection
+import com.mrzabbah.mytracker.feature_book_tracker.presentation.common.DefaultSearchBar
+import com.mrzabbah.mytracker.feature_book_tracker.presentation.util.Screen
 import kotlinx.coroutines.launch
 
+@ExperimentalComposeUiApi
 @ExperimentalAnimationApi
 @Composable
 fun BooksScreen(
@@ -30,6 +35,7 @@ fun BooksScreen(
     val state = viewModel.state.value
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
+    val focusManager = LocalFocusManager.current
 
     Scaffold(
         scaffoldState = scaffoldState
@@ -39,16 +45,13 @@ fun BooksScreen(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Search:__________",
-                    style = MaterialTheme.typography.h4
-                )
-            }
+            DefaultSearchBar(
+                onDone = { query ->
+                    if (query.isNotBlank())
+                        navController.navigate(Screen.SearchScreen.route + "/$query")
+                },
+                clear = true
+            )
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -61,6 +64,7 @@ fun BooksScreen(
                 Spacer(modifier = Modifier.width(64.dp))
                 IconButton(
                     onClick = {
+                        focusManager.clearFocus()
                         viewModel.onEvent(BooksEvent.ToggleUserOptionSection)
                     },
                 ) {
@@ -71,6 +75,7 @@ fun BooksScreen(
                 }
                 IconButton(
                     onClick = {
+                        focusManager.clearFocus()
                         viewModel.onEvent(BooksEvent.ToggleFilterSection)
                     },
                 ) {
@@ -126,9 +131,10 @@ fun BooksScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-
+                                focusManager.clearFocus()
                             },
                         onButtonOptionClick = {
+                            focusManager.clearFocus()
                             viewModel.onEvent(BooksEvent.DeleteUserBook(book))
                             scope.launch {
                                 val result = scaffoldState.snackbarHostState.showSnackbar(

@@ -26,12 +26,11 @@ fun ImageDisplayer(
     modifier: Modifier = Modifier
 ) {
     val o = LocalContext.current.resources
-    val imageBitmap =  remember {
+    val imageBitmap =
             book.bitmapByteArray?.let {
             BitmapFactory.decodeByteArray(book.bitmapByteArray,0, it.size).asImageBitmap()
         } ?: BitmapFactory.decodeResource(o, com.mrzabbah.mytracker.R.drawable.non_available).asImageBitmap()
 
-    }
     Image(
         bitmap = imageBitmap,
         contentDescription = "Thumbnail",

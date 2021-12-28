@@ -19,11 +19,11 @@ data class Book(
     val pageCount: Int? = null,
     val description: String?,
     var bitmapByteArray: ByteArray? = null,
-    val timestamp: Long,
-    val label: Int? = null
+    var timestamp: Long,
+    val label: Int = LightGray.toArgb()
 ) {
     companion object {
-        val bookLabels = listOf(RedOrange.toArgb(), LightGreen.toArgb(), Violet.toArgb(), BabyBlue.toArgb(), RedPink.toArgb(), Ruby.toArgb())
+        val bookLabels = listOf(RedOrange.toArgb(), LightGreen.toArgb(), Violet.toArgb(), BabyBlue.toArgb(), RedPink.toArgb(), Ruby.toArgb(), LightGray.toArgb())
     }
 
 }
