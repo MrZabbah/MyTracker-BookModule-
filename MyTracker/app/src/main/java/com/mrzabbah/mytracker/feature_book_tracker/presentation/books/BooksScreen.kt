@@ -13,6 +13,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -30,12 +31,12 @@ import kotlinx.coroutines.launch
 @Composable
 fun BooksScreen(
     navController: NavController,
-    viewModel: BooksViewModel = hiltViewModel()
+    viewModel: BooksViewModel = hiltViewModel(),
+    focusManager: FocusManager
 ) {
     val state = viewModel.state.value
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
-    val focusManager = LocalFocusManager.current
 
     Scaffold(
         scaffoldState = scaffoldState
@@ -50,7 +51,8 @@ fun BooksScreen(
                     if (query.isNotBlank())
                         navController.navigate(Screen.SearchScreen.route + "/$query")
                 },
-                clear = true
+                clear = true,
+                focusManager = focusManager
             )
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -98,7 +100,8 @@ fun BooksScreen(
                         bookOrder = state.bookOrder,
                         onOrderChange = {
                             viewModel.onEvent(BooksEvent.Order(it))
-                        }
+                        },
+                        focusManager = focusManager
                     )
                 }
                 if (state.isFilterSectionVisible) {
@@ -117,7 +120,8 @@ fun BooksScreen(
                         },
                         onCheckSpecificLabel = {
                             viewModel.onEvent(BooksEvent.FilterLabel(it))
-                        }
+                        },
+                        focusManager = focusManager
                     )
                 }
             }
@@ -138,10 +142,10 @@ fun BooksScreen(
                             viewModel.onEvent(BooksEvent.DeleteUserBook(book))
                             scope.launch {
                                 val result = scaffoldState.snackbarHostState.showSnackbar(
-                                    message = "Book deleted",
+                                    message = "\"${book.title}\" has been deleted",
                                     actionLabel = "Undo"
                                 )
-                                if(result == SnackbarResult.ActionPerformed)
+                                if (result == SnackbarResult.ActionPerformed)
                                     viewModel.onEvent(BooksEvent.RestoreUserBook)
                             }
                         },
@@ -159,8 +163,8 @@ fun BooksScreen(
 @Composable
 @Preview
 fun Test() {
-        Icon(
-            imageVector = Icons.Default.FilterAlt,
-            contentDescription = "Filter"
-        )
+    Icon(
+        imageVector = Icons.Default.FilterAlt,
+        contentDescription = "Filter"
+    )
 }

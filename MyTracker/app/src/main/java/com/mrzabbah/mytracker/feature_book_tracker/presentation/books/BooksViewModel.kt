@@ -2,12 +2,17 @@ package com.mrzabbah.mytracker.feature_book_tracker.presentation.books
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mrzabbah.mytracker.feature_book_tracker.domain.model.Book
+import com.mrzabbah.mytracker.feature_book_tracker.domain.model.UserPreferences
 import com.mrzabbah.mytracker.feature_book_tracker.domain.use_case.BookTrackerUseCases
 import com.mrzabbah.mytracker.feature_book_tracker.domain.util.BookOrder
 import com.mrzabbah.mytracker.feature_book_tracker.domain.util.OrderType
+import com.mrzabbah.mytracker.feature_book_tracker.presentation.common.SearchTextFieldState
+import com.mrzabbah.mytracker.ui.theme.DarkGray
+import com.mrzabbah.mytracker.ui.theme.LightGray
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
@@ -18,34 +23,51 @@ import javax.inject.Inject
 
 @HiltViewModel
 class BooksViewModel @Inject constructor(
-    private val bookTrackerUseCases: BookTrackerUseCases
+    private val bookTrackerUseCases: BookTrackerUseCases,
 ) : ViewModel() {
 
-    private val _state = mutableStateOf(BooksState()) // State that contains the values the UI will observe
+    private val _state =
+        mutableStateOf(BooksState()) // State that contains the values the UI will observe
     val state: State<BooksState> = _state
 
-    private var _recentlyDeletedBook: Book? =null
+    private val _searchFieldState = mutableStateOf(SearchTextFieldState())
+    val searchFieldState: State<SearchTextFieldState> = _searchFieldState
+
+    private var _recentlyDeletedBook: Book? = null
 
     private var getUserBooksJob: Job? = null
+    private var setUserPreferencesJob: Job? = null
 
     private var _recentlyAuthorSelected: String? = null
 
-    private var _validator: Int = System.currentTimeMillis().toInt()
-
-    private var _recentlyLabelsSelected: MutableList<Int> = mutableListOf(_validator)
+    private var _recentlyLabelsSelected: MutableList<Int> = mutableListOf(DarkGray.toArgb())
 
     init {
-        getUserBooks(BookOrder.Date(OrderType.Descending), null, Book.bookLabels)
+        viewModelScope.launch {
+            val userPrefs = bookTrackerUseCases.getUserPreferencesUseCase()
+            _state.value = state.value.copy(
+                bookOrder = userPrefs.bookOrder,
+                authorSelected = userPrefs.authorSelected,
+                labelsSelected = userPrefs.labelsSelected,
+                isAuthorFilterActive = userPrefs.isAuthorFilterActive,
+                isLabelFilterActive = userPrefs.isLabelFilterActive
+            )
+            _recentlyLabelsSelected.addAll(userPrefs.labelsOnFilter)
+            getUserBooks(
+                state.value.bookOrder,
+                state.value.authorSelected,
+                state.value.labelsSelected
+            )
+        }
     }
 
     fun onEvent(event: BooksEvent) {
-        when(event) {
+        when (event) {
             is BooksEvent.Order -> {
                 if (state.value.bookOrder::class == event.bookOrder::class &&
-                        state.value.bookOrder.orderType == event.bookOrder.orderType
+                    state.value.bookOrder.orderType == event.bookOrder.orderType
                 )
                     return
-
                 getUserBooks(
                     event.bookOrder,
                     state.value.authorSelected,
@@ -55,8 +77,9 @@ class BooksViewModel @Inject constructor(
             is BooksEvent.FilterAuthor -> {
                 if (_recentlyAuthorSelected != null &&
                     event.author != null &&
-                    _recentlyAuthorSelected.equals(event.author))
-                        return
+                    _recentlyAuthorSelected.equals(event.author)
+                )
+                    return
 
                 if (_recentlyAuthorSelected == null && event.author == null)
                     return
@@ -79,8 +102,6 @@ class BooksViewModel @Inject constructor(
                     _recentlyLabelsSelected.remove(event.label)
                 else
                     _recentlyLabelsSelected.add(event.label)
-
-                validateFilterCheckBox()
 
                 _state.value = state.value.copy(
                     labelsSelected = listOf<Int>().apply { addAll(_recentlyLabelsSelected) }
@@ -126,7 +147,6 @@ class BooksViewModel @Inject constructor(
                     isAuthorFilterActive = !state.value.isAuthorFilterActive,
                     authorSelected = authorToDisplay
                 )
-
                 getUserBooks(
                     state.value.bookOrder,
                     authorToDisplay,
@@ -144,19 +164,25 @@ class BooksViewModel @Inject constructor(
                     isLabelFilterActive = !state.value.isLabelFilterActive,
                     labelsSelected = listToDisplay
                 )
+
                 getUserBooks(
                     state.value.bookOrder,
                     state.value.authorSelected,
                     listToDisplay
                 )
+
+            }
+            is BooksEvent.ChangeSearchFocus -> {
+                _searchFieldState.value = searchFieldState.value.copy(
+                    isFocused = event.focusState.isFocused
+                )
+            }
+            is BooksEvent.EnteredSearch -> {
+                _searchFieldState.value = searchFieldState.value.copy(
+                    text = event.value
+                )
             }
         }
-    }
-
-    private fun validateFilterCheckBox() {
-        _recentlyLabelsSelected.remove(_validator)
-        _validator = System.currentTimeMillis().toInt()
-        _recentlyLabelsSelected.add(_validator)
     }
 
     private fun getUserBooks(bookOrder: BookOrder, author: String?, labels: List<Int>) {
@@ -169,7 +195,15 @@ class BooksViewModel @Inject constructor(
                     authorSelected = author,
                     labelsSelected = labels
                 )
+                setUserPreferences(state.value.getUserPreferences(_recentlyLabelsSelected))
             }
             .launchIn(viewModelScope)
+    }
+
+    private fun setUserPreferences(userPreferences: UserPreferences) {
+        setUserPreferencesJob?.cancel()
+        setUserPreferencesJob = viewModelScope.launch {
+            bookTrackerUseCases.setUserPreferencesUseCase(userPreferences)
+        }
     }
 }

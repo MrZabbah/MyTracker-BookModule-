@@ -5,7 +5,9 @@ import androidx.room.Room
 import com.mrzabbah.mytracker.feature_book_tracker.data.data_remote.GoogleBooksService
 import com.mrzabbah.mytracker.feature_book_tracker.data.data_source.BookDatabase
 import com.mrzabbah.mytracker.feature_book_tracker.data.repository.BookRepositoryImpl
+import com.mrzabbah.mytracker.feature_book_tracker.data.repository.UserPrefsRepositoryImpl
 import com.mrzabbah.mytracker.feature_book_tracker.domain.repository.BookRepository
+import com.mrzabbah.mytracker.feature_book_tracker.domain.repository.UserPrefsRepository
 import com.mrzabbah.mytracker.feature_book_tracker.domain.use_case.*
 import dagger.Module
 import dagger.Provides
@@ -40,15 +42,23 @@ object AppModule {
     fun provideBookRepository(db: BookDatabase, api: GoogleBooksService): BookRepository {
         return BookRepositoryImpl(db.bookDao, api)
     }
-    
+
     @Provides
     @Singleton
-    fun provideBookUseCases(repository: BookRepository): BookTrackerUseCases {
+    fun provideUserPrefsRepository(db: BookDatabase): UserPrefsRepository {
+        return UserPrefsRepositoryImpl(db.userPrefsDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideBookUseCases(bookRepository: BookRepository, userPrefsRepository: UserPrefsRepository): BookTrackerUseCases {
         return BookTrackerUseCases(
-            getUserBooksUseCase = GetUserBooksUseCase(repository),
-            deleteUserBookUseCase = DeleteUserBookUseCase(repository),
-            addUserBookUseCase = AddUserBookUseCase(repository),
-            getBookSearchUseCase = GetBookSearchUseCase(repository)
+            getUserBooksUseCase = GetUserBooksUseCase(bookRepository),
+            deleteUserBookUseCase = DeleteUserBookUseCase(bookRepository),
+            addUserBookUseCase = AddUserBookUseCase(bookRepository),
+            getBookSearchUseCase = GetBookSearchUseCase(bookRepository),
+            getUserPreferencesUseCase = GetUserPreferencesUseCase(userPrefsRepository),
+            setUserPreferencesUseCase = SetUserPreferencesUseCase(userPrefsRepository)
         )
     }
 }

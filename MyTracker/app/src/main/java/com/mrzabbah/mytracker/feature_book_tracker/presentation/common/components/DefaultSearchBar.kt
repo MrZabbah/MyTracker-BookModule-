@@ -2,8 +2,10 @@ package com.mrzabbah.mytracker.feature_book_tracker.presentation.common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -33,13 +35,13 @@ import com.mrzabbah.mytracker.ui.theme.LightGray
 fun DefaultSearchBar(
     onDone: (String) -> Unit,
     initialSearch: String = "",
-    clear: Boolean
+    clear: Boolean,
+    focusManager: FocusManager
 ) {
     val textState = remember { mutableStateOf(TextFieldValue(initialSearch)) }
     val colorBackground = remember { mutableStateOf(Gray) }
     val colorOnBackground = remember { mutableStateOf(LightGray) }
     val colorText = remember { mutableStateOf(CasualBlue) }
-    val focusState = LocalFocusManager.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -91,6 +93,21 @@ fun DefaultSearchBar(
                     tint = colorText.value
                 )
             },
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Filled.Close,
+                    contentDescription = "Clear icon",
+                    tint = if (colorText.value.equals(CasualBlue))
+                        CasualBlue
+                    else
+                        Color.Transparent,
+                    modifier = Modifier
+                        .clickable(
+                            enabled = colorText.value.equals(CasualBlue)
+                        )
+                        { textState.value = TextFieldValue("") },
+                )
+            },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
                 imeAction = ImeAction.Done
@@ -99,9 +116,10 @@ fun DefaultSearchBar(
                 onDone = {
                     onDone(textState.value.text)
                     if (clear) textState.value = TextFieldValue("")
-                    focusState.clearFocus()
+                    focusManager.clearFocus()
                 },
-            )
+            ),
+            singleLine = true
         )
     }
 }
