@@ -9,22 +9,34 @@ import java.lang.Exception
 
 class GoogleBooksServiceImpl(
     private val client: HttpClient
-): GoogleBooksService {
+) : GoogleBooksService {
 
     override suspend fun getBookSearch(title: String?, author: String?): BookSearchDto {
         var query = ""
-        title?.let { query = query.plus("intitle:${title.lowercase()}+") }
-        author?.let { query = query.plus("inauthor:${author.lowercase()}") }
+        title?.let {
+            if (title.isNotBlank())
+                query = query.plus("intitle:${title.lowercase()}")
+        }
+        author?.let {
+            if (author.isNotBlank()) {
+                if (title != null && title.isNotBlank())
+                    query = query.plus("+")
+                query = query.plus("inauthor:${author.lowercase()}")
+            }
+        }
 
         if (query.isBlank())
             throw InvalidQueryException("There is no query. Please insert one before searching.")
 
-            return client.get(scheme = "https") {
-                url(HttpRoutes.VOLUMES)
-                parameter("q", query)
-                parameter("maxResults", 40)
-                parameter("fields","totalItems,items(volumeInfo(title,subtitle,authors,publisher,categories,imageLinks,pageCount,description))")
-            }
+        return client.get(scheme = "https") {
+            url(HttpRoutes.VOLUMES)
+            parameter("q", query)
+            parameter("maxResults", 40)
+            parameter(
+                "fields",
+                "totalItems,items(volumeInfo(title,subtitle,authors,publisher,categories,imageLinks,pageCount,description))"
+            )
+        }
     }
 
     override suspend fun getThumbnail(url: String): ByteArray {

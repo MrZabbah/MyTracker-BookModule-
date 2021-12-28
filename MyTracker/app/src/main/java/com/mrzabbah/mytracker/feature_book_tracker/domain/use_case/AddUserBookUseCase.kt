@@ -15,6 +15,7 @@ class AddUserBookUseCase(
         if (book.pageCount == null || book.pageCount <= 0)
             throw InvalidBookException("This book has no page count. Please, try to reload the search")
 
+        book.timestamp = System.currentTimeMillis()
         repository.insertToUserBooks(book)
     }
 }

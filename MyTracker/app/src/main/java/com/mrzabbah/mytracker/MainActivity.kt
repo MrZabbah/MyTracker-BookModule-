@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,7 +16,10 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -26,6 +31,7 @@ import androidx.navigation.navArgument
 import com.mrzabbah.mytracker.feature_book_tracker.data.data_remote.GoogleBooksService
 import com.mrzabbah.mytracker.feature_book_tracker.data.data_remote.dto.BookSearchDto
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.books.BooksScreen
+import com.mrzabbah.mytracker.feature_book_tracker.presentation.common.DefaultSearchBar
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.search.SearchScreen
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.util.Screen
 import com.mrzabbah.mytracker.ui.theme.MyTrackerTheme
@@ -35,32 +41,52 @@ import kotlinx.serialization.ExperimentalSerializationApi
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @ExperimentalSerializationApi
-    private val service = GoogleBooksService.create()
-
-   @ExperimentalAnimationApi
+    @ExperimentalComposeUiApi
+    @ExperimentalAnimationApi
     @ExperimentalSerializationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MyTrackerTheme {
+                val focusManager = LocalFocusManager.current
                 Surface(
-                    color = MaterialTheme.colors.background
+                    color = MaterialTheme.colors.background,
+                    modifier = Modifier
+                        .clickable(
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() } // This is mandatory
+                        ) {
+                            focusManager.clearFocus()
+                        }
                 ) {
                     val navController = rememberNavController()
-                    NavHost(
-                        navController = navController,
-                        startDestination = Screen.SearchScreen.route
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
                     ) {
-                        composable(
-                            route = Screen.BooksScreen.route
+                        //val search = DefaultSearchBar(navController = navController)
+                        NavHost(
+                            navController = navController,
+                            startDestination = Screen.BooksScreen.route
                         ) {
-                            BooksScreen(navController = navController)
-                        }
-                        composable(
-                            route = Screen.SearchScreen.route
-                        ) {
-                            SearchScreen(navController = navController)
+                            composable(
+                                route = Screen.BooksScreen.route
+                            ) {
+                                BooksScreen(navController = navController)
+                            }
+                            composable(
+                                route = Screen.SearchScreen.route + "/{query}",
+                                arguments = listOf(
+                                    navArgument(
+                                        name = "query"
+                                    ) {
+                                        type = NavType.StringType
+                                        defaultValue = ""
+                                    }
+                                )
+                            ) {
+                                SearchScreen(navController = navController)
+                            }
                         }
                     }
                 }
@@ -68,15 +94,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    @Composable
-    fun SearchBar(
-        navController: NavController,
-        route: String,
-        modifier: Modifier,
-        onClearClick: () -> Unit
-    ) {
-
-    }
 
     /*@ExperimentalSerializationApi
     override fun onCreate(savedInstanceState: Bundle?) {

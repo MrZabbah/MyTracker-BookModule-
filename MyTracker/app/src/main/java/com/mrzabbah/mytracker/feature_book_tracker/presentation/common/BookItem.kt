@@ -43,7 +43,7 @@ fun BookItem(
 
             clipPath(clipPath) {
                 drawRoundRect(
-                    color = Color(book.label ?: LightGray.toArgb()),
+                    color = Color(book.label),
                     size = size,
                     cornerRadius = CornerRadius(cornerRadius.toPx())
                 )
