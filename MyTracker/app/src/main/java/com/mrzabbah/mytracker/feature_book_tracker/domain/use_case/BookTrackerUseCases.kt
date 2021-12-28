@@ -4,5 +4,7 @@ data class BookTrackerUseCases(
     val getUserBooksUseCase: GetUserBooksUseCase,
     val deleteUserBookUseCase: DeleteUserBookUseCase,
     val addUserBookUseCase: AddUserBookUseCase,
-    val getBookSearchUseCase: GetBookSearchUseCase
+    val getBookSearchUseCase: GetBookSearchUseCase,
+    val getUserPreferencesUseCase: GetUserPreferencesUseCase,
+    val setUserPreferencesUseCase: SetUserPreferencesUseCase
 )

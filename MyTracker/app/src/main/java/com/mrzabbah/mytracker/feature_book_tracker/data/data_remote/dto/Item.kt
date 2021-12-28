@@ -27,7 +27,7 @@ data class Item(
             thumbnail = volumeInfo?.imageLinks?.thumbnail,
             pageCount = volumeInfo?.pageCount,
             description = volumeInfo?.description,
-            timestamp = System.currentTimeMillis(),
+            timestamp = 0L,
         )
     }
 }

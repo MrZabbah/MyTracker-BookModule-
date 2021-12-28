@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import com.mrzabbah.mytracker.ui.theme.*
@@ -18,7 +19,8 @@ fun FilterSection(
     labelsSelected: List<Int>,
     onCheckAuthorFilter: (Boolean) -> Unit,
     onCheckLabelFilter: (Boolean) -> Unit,
-    onCheckSpecificLabel: (Int) -> Unit
+    onCheckSpecificLabel: (Int) -> Unit,
+    focusManager: FocusManager
 ) {
     Column(
         modifier = modifier
@@ -27,6 +29,7 @@ fun FilterSection(
             text = "Author filter",
             checked = authorFilter,
             onCheck = {
+                focusManager.clearFocus()
                 onCheckAuthorFilter(it)
             }
         )
@@ -35,16 +38,18 @@ fun FilterSection(
             text = "Label filter",
             checked = labelFilter,
             onCheck = {
+                focusManager.clearFocus()
                 onCheckLabelFilter(it)
             }
         )
+        Spacer(modifier = Modifier.height(8.dp))
         AnimatedVisibility(
             visible = labelFilter,
             enter = fadeIn() + slideInVertically(),
             exit = fadeOut() + slideOutVertically()
         ) {
             Column(
-                modifier = modifier,
+                modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Row(
@@ -56,6 +61,7 @@ fun FilterSection(
                         color = RedOrange,
                         checked = labelsSelected.contains(RedOrange.toArgb()),
                         onCheck = {
+                            focusManager.clearFocus()
                             onCheckSpecificLabel(RedOrange.toArgb())
                         }
                     )
@@ -65,6 +71,7 @@ fun FilterSection(
                         color = LightGreen,
                         checked = labelsSelected.contains(LightGreen.toArgb()),
                         onCheck = {
+                            focusManager.clearFocus()
                             onCheckSpecificLabel(LightGreen.toArgb())
                         }
                     )
@@ -73,6 +80,7 @@ fun FilterSection(
                         color = Violet,
                         checked = labelsSelected.contains(Violet.toArgb()),
                         onCheck = {
+                            focusManager.clearFocus()
                             onCheckSpecificLabel(Violet.toArgb())
                         }
                     )
@@ -87,6 +95,7 @@ fun FilterSection(
                         color = BabyBlue,
                         checked = labelsSelected.contains(BabyBlue.toArgb()),
                         onCheck = {
+                            focusManager.clearFocus()
                             onCheckSpecificLabel(BabyBlue.toArgb())
                         }
                     )
@@ -95,6 +104,7 @@ fun FilterSection(
                         color = RedPink,
                         checked = labelsSelected.contains(RedPink.toArgb()),
                         onCheck = {
+                            focusManager.clearFocus()
                             onCheckSpecificLabel(RedPink.toArgb())
                         }
                     )
@@ -103,12 +113,12 @@ fun FilterSection(
                         color = Ruby,
                         checked = labelsSelected.contains(Ruby.toArgb()),
                         onCheck = {
+                            focusManager.clearFocus()
                             onCheckSpecificLabel(Ruby.toArgb())
                         }
                     )
                 }
             }
         }
-        Spacer(modifier = Modifier.height(16.dp))
     }
 }

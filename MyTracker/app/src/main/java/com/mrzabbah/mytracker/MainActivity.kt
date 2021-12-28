@@ -1,6 +1,8 @@
 package com.mrzabbah.mytracker
 
+import android.content.Context
 import android.os.Bundle
+import android.view.MotionEvent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -22,6 +24,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -36,6 +41,7 @@ import com.mrzabbah.mytracker.feature_book_tracker.presentation.search.SearchScr
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.util.Screen
 import com.mrzabbah.mytracker.ui.theme.MyTrackerTheme
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.serialization.ExperimentalSerializationApi
 
 @AndroidEntryPoint
@@ -48,23 +54,21 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MyTrackerTheme {
-                val focusManager = LocalFocusManager.current
                 Surface(
                     color = MaterialTheme.colors.background,
-                    modifier = Modifier
-                        .clickable(
-                            indication = null,
-                            interactionSource = remember { MutableInteractionSource() } // This is mandatory
-                        ) {
-                            focusManager.clearFocus()
-                        }
                 ) {
                     val navController = rememberNavController()
+                    val focusManager = LocalFocusManager.current
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .clickable(
+                                indication = null,
+                                interactionSource = remember { MutableInteractionSource() } // This is mandatory
+                            ) {
+                                focusManager.clearFocus()
+                            }
                     ) {
-                        //val search = DefaultSearchBar(navController = navController)
                         NavHost(
                             navController = navController,
                             startDestination = Screen.BooksScreen.route
@@ -72,7 +76,10 @@ class MainActivity : ComponentActivity() {
                             composable(
                                 route = Screen.BooksScreen.route
                             ) {
-                                BooksScreen(navController = navController)
+                                BooksScreen(
+                                    navController = navController,
+                                    focusManager = focusManager
+                                )
                             }
                             composable(
                                 route = Screen.SearchScreen.route + "/{query}",
@@ -85,7 +92,10 @@ class MainActivity : ComponentActivity() {
                                     }
                                 )
                             ) {
-                                SearchScreen(navController = navController)
+                                SearchScreen(
+                                    navController = navController,
+                                    focusManager = focusManager
+                                )
                             }
                         }
                     }
@@ -93,49 +103,4 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-
-    /*@ExperimentalSerializationApi
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            val books = produceState<BookSearchDto?>(
-                initialValue = null,
-                producer = {
-                    value = service.getBookSearch("el codigo da vinci", null)
-                }
-            )
-
-            MyTrackerTheme {
-                val scaffoldState = rememberScaffoldState()
-
-                LaunchedEffect(key1 = true ) {
-
-                }
-
-
-                // A surface container using the 'background' color from the theme
-                Surface(color = MaterialTheme.colors.background) {
-                    Text(text = "COUNT: ${books.value?.items?.size}", fontSize = 20.sp)
-                    Spacer(modifier = Modifier.height(10.dp))
-                    LazyColumn{
-                        books.value?.items?.let {
-                            items(it){
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp)
-                                ) {
-                                    it.volumeInfo?.title?.let { it1 -> Text(text = it1, fontSize = 20.sp) }
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                    it.volumeInfo?.authors?.get(0)
-                                        ?.let { it1 -> Text(text = it1, fontSize = 20.sp) }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }*/
 }

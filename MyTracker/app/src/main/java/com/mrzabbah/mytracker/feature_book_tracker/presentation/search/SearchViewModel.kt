@@ -10,6 +10,8 @@ import com.mrzabbah.mytracker.feature_book_tracker.domain.model.InvalidBookExcep
 import com.mrzabbah.mytracker.feature_book_tracker.domain.use_case.BookTrackerUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -25,6 +27,13 @@ class SearchViewModel @Inject constructor(
     val state: State<SearchState> = _state
 
     private var getSearchBooksJob: Job? = null
+
+    private val _eventFlow = MutableSharedFlow<UiEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
+
+    sealed class UiEvent {
+        data class ShowSnackbar(val message: String): UiEvent()
+    }
 
     init {
         savedStateHandle.get<String>("query")?.let { query ->
@@ -44,8 +53,9 @@ class SearchViewModel @Inject constructor(
                 viewModelScope.launch {
                     try {
                         bookTrackerUseCases.addUserBookUseCase(event.book)
+                        _eventFlow.emit(UiEvent.ShowSnackbar("\"${event.book.title}\" has been added to \"Your Books\""))
                     } catch (e: InvalidBookException) {
-                        println("NO BUENO DE BOOK")
+                        _eventFlow.emit(UiEvent.ShowSnackbar("Not possible to save. The book is corrupted"))
                     }
                 }
             }

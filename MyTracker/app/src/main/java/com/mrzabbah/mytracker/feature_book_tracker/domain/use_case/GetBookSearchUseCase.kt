@@ -36,7 +36,7 @@ class GetBookSearchUseCase(
         } catch (e: InvalidQueryException) {
             emit(Resource.Error(e.localizedMessage ?: "An unexpected error occurred"))
         } catch (e: IOException) {
-            emit(Resource.Error(e.localizedMessage ?: "Couldn't reach server. Please check your internet connection"))
+            emit(Resource.Error("Couldn't reach server. Please check your internet connection"))
         } catch (e: RedirectResponseException) {
             // 3xx - responses
             emit(Resource.Error(e.localizedMessage ?: "An unexpected error occurred"))
