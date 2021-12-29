@@ -57,7 +57,7 @@ fun FilterSection(
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
                     DefaultCheckBox(
-                        text = "URGENT",
+                        text = "TO_BUY",
                         color = RedOrange,
                         checked = labelsSelected.contains(RedOrange.toArgb()),
                         onCheck = {

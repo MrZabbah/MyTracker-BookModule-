@@ -1,5 +1,6 @@
 package com.mrzabbah.mytracker.feature_book_tracker.presentation.search
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,12 +15,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.mrzabbah.mytracker.feature_book_tracker.domain.model.Book
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.books.BooksEvent
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.common.BookItem
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.common.DefaultSearchBar
@@ -35,7 +38,6 @@ fun SearchScreen(
 ) {
     val state = viewModel.state.value
     val scaffoldState = rememberScaffoldState()
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
@@ -67,7 +69,7 @@ fun SearchScreen(
                     initialSearch = state.lastSearch,
                     clear = false,
                     focusManager = focusManager,
-                    onChangeClick = { viewModel.onEvent(SearchEvent.ChangeSearchMode)},
+                    onChangeClick = { viewModel.onEvent(SearchEvent.ChangeSearchMode) },
                     searchMode = state.searchMode
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -110,10 +112,13 @@ fun SearchScreen(
         }
     }
 }
+
 @Preview
 @Composable
 fun test() {
     Icon(
-        imageVector = Icons.Filled.Male,
-        contentDescription = "")
+        imageVector = Icons.Filled.BookmarkBorder,
+        contentDescription = "",
+        tint = Color(Book.nonLabelColor)
+    )
 }

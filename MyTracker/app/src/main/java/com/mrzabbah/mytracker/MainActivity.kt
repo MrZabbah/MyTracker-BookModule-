@@ -38,6 +38,7 @@ import com.mrzabbah.mytracker.feature_book_tracker.data.data_remote.dto.BookSear
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.books.BooksScreen
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.common.DefaultSearchBar
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.search.SearchScreen
+import com.mrzabbah.mytracker.feature_book_tracker.presentation.specificBook.SpecificBookScreen
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.util.Screen
 import com.mrzabbah.mytracker.ui.theme.MyTrackerTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -102,6 +103,22 @@ class MainActivity : ComponentActivity() {
                                 SearchScreen(
                                     navController = navController,
                                     focusManager = focusManager
+                                )
+                            }
+                            composable(
+                                route = Screen.SpecificBookScreen.route +
+                                        "/{id}",
+                                arguments = listOf(
+                                    navArgument(
+                                        name = "id"
+                                    ) {
+                                        type = NavType.StringType
+                                        defaultValue = ""
+                                    }
+                                )
+                            ) {
+                                SpecificBookScreen(
+                                    navController = navController
                                 )
                             }
                         }

@@ -1,8 +1,6 @@
 package com.mrzabbah.mytracker.feature_book_tracker.data.data_remote.dto
 
 
-import android.content.res.Resources
-import android.graphics.BitmapFactory
 import com.mrzabbah.mytracker.feature_book_tracker.domain.model.Book
 import kotlinx.serialization.Serializable
 
@@ -27,8 +25,7 @@ data class Item(
             categories = volumeInfo?.categories,
             thumbnail = volumeInfo?.imageLinks?.thumbnail,
             pageCount = volumeInfo?.pageCount,
-            description = volumeInfo?.description,
-            timestamp = 0L,
+            description = volumeInfo?.description
         )
     }
 }

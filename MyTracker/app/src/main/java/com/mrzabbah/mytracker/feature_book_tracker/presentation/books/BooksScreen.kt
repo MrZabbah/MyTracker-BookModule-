@@ -146,6 +146,8 @@ fun BooksScreen(
                             .fillMaxWidth()
                             .clickable {
                                 focusManager.clearFocus()
+                                navController.navigate(Screen.SpecificBookScreen.route +
+                                        "/${book.id}")
                             },
                         onButtonOptionClick = {
                             focusManager.clearFocus()

@@ -187,7 +187,7 @@ class BooksViewModel @Inject constructor(
                 val newSearchMode = when(state.value.searchMode) {
                     SearchMode.Advanced -> SearchMode.ByTitle
                     SearchMode.ByAuthor -> SearchMode.Advanced
-                    SearchMode.ByTitle -> SearchMode.ByAuthor
+                    else -> SearchMode.ByAuthor
                 }
                 _state.value = state.value.copy(
                     searchMode = newSearchMode

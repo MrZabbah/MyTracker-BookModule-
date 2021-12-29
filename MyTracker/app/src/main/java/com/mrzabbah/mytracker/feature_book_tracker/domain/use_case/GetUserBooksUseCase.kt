@@ -21,14 +21,14 @@ class GetUserBooksUseCase(
                 is OrderType.Ascending -> {
                     when(bookOrder) {
                         is BookOrder.Author -> books.sortedBy { it.authors?.get(0)?.lowercase() }
-                        is BookOrder.Date -> books.sortedBy { it.timestamp }
+                        is BookOrder.Date -> books.sortedBy { it.addedTimestamp }
                         is BookOrder.Label -> books.sortedBy { it.label }
                     }
                 }
                 is OrderType.Descending -> {
                     when(bookOrder) {
                         is BookOrder.Author -> books.sortedByDescending { it.authors?.get(0)?.lowercase() }
-                        is BookOrder.Date -> books.sortedByDescending { it.timestamp }
+                        is BookOrder.Date -> books.sortedByDescending { it.addedTimestamp }
                         is BookOrder.Label -> books.sortedByDescending { it.label }
                     }
                 }
