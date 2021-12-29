@@ -1,15 +1,10 @@
 package com.mrzabbah.mytracker.feature_book_tracker.domain.use_case
 
-import android.content.res.Resources
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
 import com.mrzabbah.mytracker.core.util.Resource
-import com.mrzabbah.mytracker.core.util.SimpleResource
 import com.mrzabbah.mytracker.feature_book_tracker.data.data_remote.InvalidQueryException
 import com.mrzabbah.mytracker.feature_book_tracker.domain.model.Book
 import com.mrzabbah.mytracker.feature_book_tracker.domain.repository.BookRepository
+import com.mrzabbah.mytracker.feature_book_tracker.domain.util.SearchMode
 import io.ktor.client.features.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -22,11 +17,13 @@ class GetBookSearchUseCase(
 ) {
 
     operator fun invoke(
-        title: String?, author: String?
+        searchString: String?, searchMode: SearchMode
     ): Flow<Resource<List<Book>>> = flow {
         try {
             emit(Resource.Loading())
-            val books = repository.getBookSearch(title, author).items.map { it.toBook() }
+            val queryParams = getQueryParams(searchString, searchMode)
+            val books =
+                repository.getBookSearch(queryParams[0], queryParams[1]).items.map { it.toBook() }
             books.onEach { book ->
                 book.thumbnail?.let {
                     book.bitmapByteArray = repository.getThumbnail(it)
@@ -49,5 +46,36 @@ class GetBookSearchUseCase(
         } catch (e: Exception) {
             emit(Resource.Error("Not results found." ?: "An unexpected error occurred"))
         }
+    }
+
+    private fun getQueryParams(rawSearch: String?, searchMode: SearchMode): List<String?> {
+        return when (searchMode) {
+            SearchMode.Advanced -> {
+                val list = mutableListOf<String?>()
+                rawSearch?.split("|")?.onEach {
+                    if (it.isNotBlank()) {
+                        val string = cleanString(it)
+                        list.add(string)
+                    }
+                    else
+                        list.add(null)
+                }
+                if (list.isEmpty()) listOf(null, null) else list
+            }
+            SearchMode.ByAuthor -> {
+                listOf(null, rawSearch?.let { cleanString(it) })
+            }
+            SearchMode.ByTitle -> {
+                listOf(rawSearch?.let { cleanString(it) }, null)
+            }
+        }
+    }
+
+    private fun cleanString(string: String): String {
+        var cleanString = ""
+        string.split("\\s+".toRegex()).onEach { word ->
+            cleanString += if (word.isBlank() || cleanString.isBlank()) word else " $word"
+        }
+        return cleanString
     }
 }

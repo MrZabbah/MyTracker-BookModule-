@@ -4,10 +4,12 @@ import com.mrzabbah.mytracker.feature_book_tracker.domain.model.Book
 import com.mrzabbah.mytracker.feature_book_tracker.domain.model.UserPreferences
 import com.mrzabbah.mytracker.feature_book_tracker.domain.util.BookOrder
 import com.mrzabbah.mytracker.feature_book_tracker.domain.util.OrderType
+import com.mrzabbah.mytracker.feature_book_tracker.domain.util.SearchMode
 
 data class BooksState(
     val books: List<Book> = emptyList(),
     val bookOrder: BookOrder = BookOrder.Date(OrderType.Descending),
+    val searchMode: SearchMode = SearchMode.ByTitle,
     val authorSelected: String? = null,
     val labelsSelected: List<Int> = Book.bookLabels,
     val isUserOptionSectionVisible: Boolean = false,

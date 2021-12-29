@@ -12,6 +12,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -24,8 +25,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mrzabbah.mytracker.feature_book_tracker.domain.util.SearchMode
 import com.mrzabbah.mytracker.ui.theme.CasualBlue
 import com.mrzabbah.mytracker.ui.theme.Gray
 import com.mrzabbah.mytracker.ui.theme.LightGray
@@ -36,18 +40,19 @@ fun DefaultSearchBar(
     onDone: (String) -> Unit,
     initialSearch: String = "",
     clear: Boolean,
-    focusManager: FocusManager
+    focusManager: FocusManager,
+    searchMode: SearchMode = SearchMode.ByTitle,
+    onChangeClick: () -> Unit
 ) {
-    val textState = remember { mutableStateOf(TextFieldValue(initialSearch)) }
+    val textState = remember { mutableStateOf(TextFieldValue(text = initialSearch)) }
     val colorBackground = remember { mutableStateOf(Gray) }
     val colorOnBackground = remember { mutableStateOf(LightGray) }
-    val colorText = remember { mutableStateOf(CasualBlue) }
+    val colorText = remember { mutableStateOf(LightGray) }
     Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
     ) {
         TextField(
             value = textState.value,
@@ -55,8 +60,9 @@ fun DefaultSearchBar(
                 textState.value = it
             },
             placeholder = {
-                Text(text = "Search book", color = LightGray)
+                Text(text = searchMode.toString(), color = LightGray)
             },
+            label = { Text(text = searchMode.toString(), color = LightGray) },
             textStyle = TextStyle(
                 color = colorText.value,
                 fontSize = 16.sp
@@ -69,6 +75,7 @@ fun DefaultSearchBar(
                     shape = RoundedCornerShape(60.dp)
                 )
                 .height(54.dp)
+                .width(TextFieldDefaults.MinWidth)
                 .onFocusChanged { focusState ->
                     if (focusState.isFocused) {
                         colorText.value = CasualBlue
@@ -121,5 +128,14 @@ fun DefaultSearchBar(
             ),
             singleLine = true
         )
+        IconButton(
+            onClick = onChangeClick
+        ) {
+            Icon(
+                imageVector = Icons.Filled.ChangeCircle,
+                contentDescription = "Change search mode",
+                tint = colorText.value
+            )
+        }
     }
 }

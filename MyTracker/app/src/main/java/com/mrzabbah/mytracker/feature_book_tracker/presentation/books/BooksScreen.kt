@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -13,6 +14,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
@@ -24,6 +26,7 @@ import com.mrzabbah.mytracker.feature_book_tracker.presentation.books.components
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.books.components.OrderSection
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.common.DefaultSearchBar
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.util.Screen
+import com.mrzabbah.mytracker.ui.theme.CasualBlue
 import kotlinx.coroutines.launch
 
 @ExperimentalComposeUiApi
@@ -49,10 +52,15 @@ fun BooksScreen(
             DefaultSearchBar(
                 onDone = { query ->
                     if (query.isNotBlank())
-                        navController.navigate(Screen.SearchScreen.route + "/$query")
+                        navController.navigate(Screen.SearchScreen.route +
+                                "/$query/${state.searchMode}")
                 },
                 clear = true,
-                focusManager = focusManager
+                focusManager = focusManager,
+                searchMode = state.searchMode,
+                onChangeClick = {
+                    viewModel.onEvent(BooksEvent.ChangeSearchMode)
+                }
             )
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -157,14 +165,4 @@ fun BooksScreen(
             }
         }
     }
-}
-
-
-@Composable
-@Preview
-fun Test() {
-    Icon(
-        imageVector = Icons.Default.FilterAlt,
-        contentDescription = "Filter"
-    )
 }

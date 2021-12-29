@@ -82,10 +82,17 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
                             composable(
-                                route = Screen.SearchScreen.route + "/{query}",
+                                route = Screen.SearchScreen.route +
+                                        "/{query}/{searchMode}",
                                 arguments = listOf(
                                     navArgument(
                                         name = "query"
+                                    ) {
+                                        type = NavType.StringType
+                                        defaultValue = ""
+                                    },
+                                    navArgument(
+                                        name = "searchMode"
                                     ) {
                                         type = NavType.StringType
                                         defaultValue = ""

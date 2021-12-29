@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.mrzabbah.mytracker.core.util.Resource
 import com.mrzabbah.mytracker.feature_book_tracker.domain.model.InvalidBookException
 import com.mrzabbah.mytracker.feature_book_tracker.domain.use_case.BookTrackerUseCases
+import com.mrzabbah.mytracker.feature_book_tracker.domain.util.SearchMode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -36,8 +37,13 @@ class SearchViewModel @Inject constructor(
     }
 
     init {
+        savedStateHandle.get<String>("searchMode")?.let { searchMode ->
+            _state.value = state.value.copy(
+                searchMode = SearchMode.parseFromString(searchMode)
+            )
+        }
         savedStateHandle.get<String>("query")?.let { query ->
-            getSearchBooks(query) // habra que crear un evento al escribir y que se lance, also un job pa cancelar el previo
+            getSearchBooks(query)
         }
     }
 
@@ -59,12 +65,23 @@ class SearchViewModel @Inject constructor(
                     }
                 }
             }
+            SearchEvent.ChangeSearchMode -> {
+                val newSearchMode = when(state.value.searchMode) {
+                    SearchMode.Advanced -> SearchMode.ByTitle
+                    SearchMode.ByAuthor -> SearchMode.Advanced
+                    SearchMode.ByTitle -> SearchMode.ByAuthor
+                }
+                _state.value = state.value.copy(
+                    searchMode = newSearchMode
+                )
+            }
         }
     }
 
-    private fun getSearchBooks(title: String? = null, author: String? = null) {
+    private fun getSearchBooks(rawSearch: String? = null) {
+
         getSearchBooksJob?.cancel()
-        getSearchBooksJob = bookTrackerUseCases.getBookSearchUseCase(title, author)
+        getSearchBooksJob = bookTrackerUseCases.getBookSearchUseCase(rawSearch, state.value.searchMode)
             .onEach { result ->
                 when (result) {
                     is Resource.Error -> {
@@ -77,7 +94,7 @@ class SearchViewModel @Inject constructor(
                         _state.value = state.value.copy(
                             isLoading = true,
                             error = "",
-                            lastSearch = title ?: ""
+                            lastSearch = rawSearch ?: ""
                         )
                     }
                     is Resource.Success -> {

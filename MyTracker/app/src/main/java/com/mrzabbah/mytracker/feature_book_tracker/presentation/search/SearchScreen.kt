@@ -6,7 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -65,7 +66,9 @@ fun SearchScreen(
                     },
                     initialSearch = state.lastSearch,
                     clear = false,
-                    focusManager = focusManager
+                    focusManager = focusManager,
+                    onChangeClick = { viewModel.onEvent(SearchEvent.ChangeSearchMode)},
+                    searchMode = state.searchMode
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 LazyColumn(
@@ -106,4 +109,11 @@ fun SearchScreen(
             }
         }
     }
+}
+@Preview
+@Composable
+fun test() {
+    Icon(
+        imageVector = Icons.Filled.Male,
+        contentDescription = "")
 }
