@@ -2,6 +2,7 @@ package com.mrzabbah.mytracker.feature_book_tracker.data.repository
 
 import com.mrzabbah.mytracker.feature_book_tracker.data.data_remote.GoogleBooksService
 import com.mrzabbah.mytracker.feature_book_tracker.data.data_remote.dto.BookSearchDto
+import com.mrzabbah.mytracker.feature_book_tracker.data.data_remote.dto.Item
 import com.mrzabbah.mytracker.feature_book_tracker.data.data_source.BookDao
 import com.mrzabbah.mytracker.feature_book_tracker.domain.model.Book
 import com.mrzabbah.mytracker.feature_book_tracker.domain.repository.BookRepository
@@ -17,7 +18,7 @@ class BookRepositoryImpl @Inject constructor(
         return dao.getUserBooks(author, labels)
     }
 
-    override suspend fun getUserBookById(id: Int): Book? {
+    override suspend fun getUserBookById(id: String): Book? {
         return dao.getUserBookById(id)
     }
 
@@ -31,6 +32,10 @@ class BookRepositoryImpl @Inject constructor(
 
     override suspend fun getBookSearch(title: String?, author: String?): BookSearchDto {
         return api.getBookSearch(title, author)
+    }
+
+    override suspend fun getBookByRemoteId(id: String): Item {
+        return api.getBookByRemoteId(id)
     }
 
     override suspend fun getThumbnail(url: String): ByteArray {

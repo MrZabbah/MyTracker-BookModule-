@@ -61,7 +61,7 @@ class SearchViewModel @Inject constructor(
                         bookTrackerUseCases.addUserBookUseCase(event.book)
                         _eventFlow.emit(UiEvent.ShowSnackbar("\"${event.book.title}\" has been added to \"Your Books\""))
                     } catch (e: InvalidBookException) {
-                        _eventFlow.emit(UiEvent.ShowSnackbar("Not possible to save. The book is corrupted"))
+                        _eventFlow.emit(UiEvent.ShowSnackbar(e.message ?: "Not possible to save. The book is corrupted"))
                     }
                 }
             }

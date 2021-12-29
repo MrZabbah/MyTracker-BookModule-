@@ -19,6 +19,7 @@ data class Item(
 ) {
     fun toBook(): Book {
         return Book(
+            id = id?:"",
             title = volumeInfo?.title,
             subtitle = volumeInfo?.subtitle,
             authors = volumeInfo?.authors,

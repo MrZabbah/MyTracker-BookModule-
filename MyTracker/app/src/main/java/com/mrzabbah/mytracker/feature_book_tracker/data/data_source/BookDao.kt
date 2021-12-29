@@ -12,7 +12,7 @@ interface BookDao {
     fun getUserBooks(author: String?, labels: List<Int>): Flow<List<Book>>
 
     @Query("SELECT * FROM book WHERE id = :id")
-    suspend fun getUserBookById(id: Int): Book?
+    suspend fun getUserBookById(id: String): Book?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertToUserBooks(book: Book)
