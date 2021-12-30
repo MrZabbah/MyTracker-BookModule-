@@ -1,6 +1,7 @@
 package com.mrzabbah.mytracker.feature_book_tracker.data.data_remote
 
 import com.mrzabbah.mytracker.feature_book_tracker.data.data_remote.dto.BookSearchDto
+import com.mrzabbah.mytracker.feature_book_tracker.data.data_remote.dto.Item
 import io.ktor.client.*
 import io.ktor.client.engine.android.*
 import io.ktor.client.features.*
@@ -13,6 +14,8 @@ interface GoogleBooksService {
 
     @Throws(InvalidQueryException::class)
     suspend fun getBookSearch(title: String? = null, author: String? = null): BookSearchDto
+
+    suspend fun getBookByRemoteId(id: String): Item
 
     suspend fun getThumbnail(url: String): ByteArray
 

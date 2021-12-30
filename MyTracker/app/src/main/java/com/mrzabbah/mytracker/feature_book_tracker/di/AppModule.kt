@@ -54,8 +54,10 @@ object AppModule {
     fun provideBookUseCases(bookRepository: BookRepository, userPrefsRepository: UserPrefsRepository): BookTrackerUseCases {
         return BookTrackerUseCases(
             getUserBooksUseCase = GetUserBooksUseCase(bookRepository),
+            getUserBookByIdUseCase = GetUserBookByIdUseCase(bookRepository),
             deleteUserBookUseCase = DeleteUserBookUseCase(bookRepository),
             addUserBookUseCase = AddUserBookUseCase(bookRepository),
+            updateUserBookUseCase = UpdateUserBookUseCase(bookRepository),
             getBookSearchUseCase = GetBookSearchUseCase(bookRepository),
             getUserPreferencesUseCase = GetUserPreferencesUseCase(userPrefsRepository),
             setUserPreferencesUseCase = SetUserPreferencesUseCase(userPrefsRepository)

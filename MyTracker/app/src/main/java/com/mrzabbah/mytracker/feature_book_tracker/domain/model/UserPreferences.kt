@@ -11,7 +11,7 @@ data class UserPreferences(
     @PrimaryKey val key: String = NAME,
     val bookOrder: BookOrder = BookOrder.Date(OrderType.Descending),
     val authorSelected: String? = null,
-    val labelsSelected: List<Int> = emptyList(),
+    val labelsSelected: List<Int> = Book.bookLabels,
     val labelsOnFilter: List<Int> = emptyList(),
     val isAuthorFilterActive: Boolean = false,
     val isLabelFilterActive: Boolean = false

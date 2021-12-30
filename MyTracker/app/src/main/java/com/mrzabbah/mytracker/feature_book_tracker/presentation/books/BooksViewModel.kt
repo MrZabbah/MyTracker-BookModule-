@@ -10,6 +10,7 @@ import com.mrzabbah.mytracker.feature_book_tracker.domain.model.UserPreferences
 import com.mrzabbah.mytracker.feature_book_tracker.domain.use_case.BookTrackerUseCases
 import com.mrzabbah.mytracker.feature_book_tracker.domain.util.BookOrder
 import com.mrzabbah.mytracker.feature_book_tracker.domain.util.OrderType
+import com.mrzabbah.mytracker.feature_book_tracker.domain.util.SearchMode
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.common.SearchTextFieldState
 import com.mrzabbah.mytracker.ui.theme.DarkGray
 import com.mrzabbah.mytracker.ui.theme.LightGray
@@ -180,6 +181,16 @@ class BooksViewModel @Inject constructor(
             is BooksEvent.EnteredSearch -> {
                 _searchFieldState.value = searchFieldState.value.copy(
                     text = event.value
+                )
+            }
+            BooksEvent.ChangeSearchMode -> {
+                val newSearchMode = when(state.value.searchMode) {
+                    SearchMode.Advanced -> SearchMode.ByTitle
+                    SearchMode.ByAuthor -> SearchMode.Advanced
+                    else -> SearchMode.ByAuthor
+                }
+                _state.value = state.value.copy(
+                    searchMode = newSearchMode
                 )
             }
         }

@@ -1,10 +1,12 @@
 package com.mrzabbah.mytracker.feature_book_tracker.data.data_remote
 
 import com.mrzabbah.mytracker.feature_book_tracker.data.data_remote.dto.BookSearchDto
+import com.mrzabbah.mytracker.feature_book_tracker.data.data_remote.dto.Item
 import com.mrzabbah.mytracker.feature_book_tracker.data.data_remote.util.HttpRoutes
 import io.ktor.client.*
 import io.ktor.client.features.*
 import io.ktor.client.request.*
+import io.ktor.http.*
 import java.lang.Exception
 
 class GoogleBooksServiceImpl(
@@ -34,7 +36,17 @@ class GoogleBooksServiceImpl(
             parameter("maxResults", 40)
             parameter(
                 "fields",
-                "totalItems,items(volumeInfo(title,subtitle,authors,publisher,categories,imageLinks,pageCount,description))"
+                "totalItems,items(id,volumeInfo(title,subtitle,authors,publisher,categories,imageLinks,pageCount,description))"
+            )
+        }
+    }
+
+    override suspend fun getBookByRemoteId(id: String): Item {
+        return client.get(scheme = "https") {
+            url("${HttpRoutes.VOLUMES}/$id")
+            parameter(
+                "fields",
+                "volumeInfo(title,subtitle,authors,publisher,categories,imageLinks,pageCount,description)"
             )
         }
     }

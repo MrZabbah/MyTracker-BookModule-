@@ -11,6 +11,7 @@ sealed class BooksEvent {
     data class DeleteUserBook(val book: Book): BooksEvent()
     data class EnteredSearch(val value: String): BooksEvent()
     data class ChangeSearchFocus(val focusState: FocusState): BooksEvent()
+    object ChangeSearchMode: BooksEvent()
     object RestoreUserBook: BooksEvent()
     object ToggleUserOptionSection: BooksEvent()
     object ToggleFilterSection: BooksEvent()
