@@ -92,8 +92,14 @@ class SpecificBookViewModel @Inject constructor(
 
         val updatedBook = book.copy(
             readTime = book.readTime + time,
-            lastReadTimestamp = if (time <= 0L) System.currentTimeMillis() else null
+            lastReadTimestamp = if (time <= 0L) System.currentTimeMillis() else null,
         )
+
+        if (updatedBook.lastReadTimestamp == null) {
+            _state.value = state.value.copy(
+                isDialogToggled = !state.value.isDialogToggled
+            )
+        }
 
         updateBook(updatedBook)
     }

@@ -22,6 +22,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.mrzabbah.mytracker.ui.theme.CasualBlue
 
 @ExperimentalComposeUiApi
 @Composable
@@ -40,16 +41,17 @@ fun DefaultAlertDialog(
     Dialog(onDismissRequest = onDismiss) {
         Card(
             elevation = 8.dp,
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(12.dp),
+            backgroundColor = MaterialTheme.colors.onSurface
         ) {
 
             Column(modifier = Modifier.padding(8.dp)) {
-
                 Text(
                     text = "Set current page",
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
-                    modifier = Modifier.padding(8.dp)
+                    modifier = Modifier.padding(8.dp),
+                    color = Color.White
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 TextField(
@@ -57,6 +59,10 @@ fun DefaultAlertDialog(
                     onValueChange = { text = it },
                     colors = TextFieldDefaults.textFieldColors(
                         backgroundColor = Color.Transparent,
+                        cursorColor = CasualBlue,
+                        focusedIndicatorColor = CasualBlue,
+                        unfocusedIndicatorColor = CasualBlue,
+                        textColor = CasualBlue
                     ),
                     modifier = Modifier
                         .background(color = Color.Transparent)
@@ -67,7 +73,13 @@ fun DefaultAlertDialog(
                     ),
                     keyboardActions = KeyboardActions(
                         onDone = {
-                            onPositiveClick(if (text.isNotBlank()) text.toInt() else -1)
+                            onPositiveClick(
+                                try {
+                                    text.toInt()
+                                } catch (e: Exception) {
+                                    -1
+                                }
+                            )
                         }
                     ),
                 )
@@ -79,13 +91,13 @@ fun DefaultAlertDialog(
                 ) {
 
                     TextButton(onClick = onNegativeClick) {
-                        Text(text = "CANCEL")
+                        Text(text = "CANCEL", color = CasualBlue)
                     }
                     Spacer(modifier = Modifier.width(4.dp))
                     TextButton(onClick = {
                         onPositiveClick(if (text.isNotBlank()) text.toInt() else -1)
                     }) {
-                        Text(text = "OK")
+                        Text(text = "OK", color = CasualBlue)
                     }
                 }
             }
