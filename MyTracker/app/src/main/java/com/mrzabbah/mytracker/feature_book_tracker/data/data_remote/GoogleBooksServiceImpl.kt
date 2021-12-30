@@ -46,7 +46,7 @@ class GoogleBooksServiceImpl(
             url("${HttpRoutes.VOLUMES}/$id")
             parameter(
                 "fields",
-                "volumeInfo(authors,categories)"
+                "volumeInfo(title,subtitle,authors,publisher,categories,imageLinks,pageCount,description)"
             )
         }
     }

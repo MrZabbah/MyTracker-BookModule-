@@ -3,24 +3,41 @@ package com.mrzabbah.mytracker.feature_book_tracker.presentation.specificBook.co
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.FocusState
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 
+@ExperimentalComposeUiApi
 @Composable
-private fun DefaultAlertDialog(
+fun DefaultAlertDialog(
     onDismiss: () -> Unit,
     onNegativeClick: () -> Unit,
     onPositiveClick: (Int) -> Unit
 ) {
     var text by remember { mutableStateOf("") }
-    Dialog(onDismissRequest = onDismiss) {
+    val requester = FocusRequester()
 
+    LaunchedEffect(key1 = true) {
+        requester.requestFocus()
+    }
+
+    Dialog(onDismissRequest = onDismiss) {
         Card(
             elevation = 8.dp,
             shape = RoundedCornerShape(12.dp)
@@ -35,7 +52,6 @@ private fun DefaultAlertDialog(
                     modifier = Modifier.padding(8.dp)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-
                 TextField(
                     value = text,
                     onValueChange = { text = it },
@@ -44,6 +60,16 @@ private fun DefaultAlertDialog(
                     ),
                     modifier = Modifier
                         .background(color = Color.Transparent)
+                        .focusRequester(requester),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            onPositiveClick(if (text.isNotBlank()) text.toInt() else -1)
+                        }
+                    ),
                 )
 
                 // Buttons
@@ -57,7 +83,7 @@ private fun DefaultAlertDialog(
                     }
                     Spacer(modifier = Modifier.width(4.dp))
                     TextButton(onClick = {
-                        onPositiveClick(text.toInt())
+                        onPositiveClick(if (text.isNotBlank()) text.toInt() else -1)
                     }) {
                         Text(text = "OK")
                     }

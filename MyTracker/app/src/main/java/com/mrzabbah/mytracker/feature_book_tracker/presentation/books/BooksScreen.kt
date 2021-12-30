@@ -30,6 +30,10 @@ import com.mrzabbah.mytracker.ui.theme.CasualBlue
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 @ExperimentalComposeUiApi
 @ExperimentalAnimationApi
@@ -54,8 +58,10 @@ fun BooksScreen(
             DefaultSearchBar(
                 onDone = { query ->
                     if (query.isNotBlank())
-                        navController.navigate(Screen.SearchScreen.route +
-                                "/$query/${state.searchMode}")
+                        navController.navigate(
+                            Screen.SearchScreen.route +
+                                    "/$query/${state.searchMode}"
+                        )
                 },
                 clear = true,
                 focusManager = focusManager,
@@ -146,8 +152,15 @@ fun BooksScreen(
                             .fillMaxWidth()
                             .clickable {
                                 focusManager.clearFocus()
-                                navController.navigate(Screen.SpecificBookScreen.route +
-                                        "/${book.id}")
+                                navController.navigate(
+                                    Screen.SpecificBookScreen.route +
+                                            "/${
+                                                URLEncoder.encode(
+                                                    Json.encodeToString(book),
+                                                    StandardCharsets.UTF_8.toString()
+                                                )
+                                            }"
+                                )
                             },
                         onButtonOptionClick = {
                             focusManager.clearFocus()

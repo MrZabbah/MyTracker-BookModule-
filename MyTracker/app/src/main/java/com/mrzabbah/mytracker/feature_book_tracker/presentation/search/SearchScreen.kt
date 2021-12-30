@@ -28,6 +28,10 @@ import com.mrzabbah.mytracker.feature_book_tracker.presentation.common.BookItem
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.common.DefaultSearchBar
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.util.Screen
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 @ExperimentalComposeUiApi
 @Composable
@@ -72,7 +76,7 @@ fun SearchScreen(
                     onChangeClick = { viewModel.onEvent(SearchEvent.ChangeSearchMode) },
                     searchMode = state.searchMode
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(16.dp))
                 LazyColumn(
                     modifier = Modifier
                         .padding(horizontal = 10.dp)
@@ -87,6 +91,15 @@ fun SearchScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
+                                    navController.navigate(
+                                        Screen.SpecificBookScreen.route +
+                                                "/${
+                                                    URLEncoder.encode(
+                                                        Json.encodeToString(book),
+                                                        StandardCharsets.UTF_8.toString()
+                                                    )
+                                                }"
+                                    )
                                 },
                             buttonIcon = Icons.Default.Add,
                             buttonDescription = "Add book to bookshelf"
@@ -117,7 +130,7 @@ fun SearchScreen(
 @Composable
 fun test() {
     Icon(
-        imageVector = Icons.Filled.BookmarkBorder,
+        imageVector = Icons.Filled.ArrowBack,
         contentDescription = "",
         tint = Color(Book.nonLabelColor)
     )

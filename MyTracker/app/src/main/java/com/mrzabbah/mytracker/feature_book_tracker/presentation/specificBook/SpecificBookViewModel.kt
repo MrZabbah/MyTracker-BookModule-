@@ -6,11 +6,18 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mrzabbah.mytracker.feature_book_tracker.domain.model.Book
+import com.mrzabbah.mytracker.feature_book_tracker.domain.model.InvalidBookException
 import com.mrzabbah.mytracker.feature_book_tracker.domain.use_case.BookTrackerUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import java.net.URLDecoder
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import javax.inject.Inject
 
 @HiltViewModel
@@ -22,7 +29,7 @@ class SpecificBookViewModel @Inject constructor(
     private val _state = mutableStateOf(SpecificBookState())
     val state: State<SpecificBookState> = _state
 
-    private val _eventFlow = MutableSharedFlow<SpecificBookViewModel.UiEvent>()
+    private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
     sealed class UiEvent {
@@ -30,12 +37,11 @@ class SpecificBookViewModel @Inject constructor(
     }
 
     init {
-        savedStateHandle.get<String>("id")?.let { id ->
-            viewModelScope.launch {
-                _state.value = state.value.copy(
-                    book = bookTrackerUseCases.getUserBookByIdUseCase(id)
-                )
-            }
+        savedStateHandle.get<String>("id")?.let { bookEncoded ->
+            val bookSerialized = URLDecoder.decode(bookEncoded, StandardCharsets.UTF_8.toString())
+            _state.value = state.value.copy(
+                book = Json.decodeFromString<Book>(bookSerialized)
+            )
         }
     }
 
