@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -43,7 +44,7 @@ fun BookItem(
 
             clipPath(clipPath) {
                 drawRoundRect(
-                    color = Color(book.label),
+                    color = Color(Book.nonLabelColor),
                     size = size,
                     cornerRadius = CornerRadius(cornerRadius.toPx())
                 )
@@ -57,6 +58,20 @@ fun BookItem(
                 Icon(
                     imageVector = buttonIcon,
                     contentDescription = buttonDescription
+                )
+            }
+            IconButton(
+                onClick = { /*TODO*/ },
+                modifier = Modifier.align(Alignment.TopEnd),
+                enabled = false
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Bookmark,
+                    contentDescription = "Label mark",
+                    tint = if (book.label == Book.nonLabelColor || book.addedTimestamp <= 0L)
+                        Color.Transparent
+                    else
+                        Color(book.label)
                 )
             }
         }

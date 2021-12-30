@@ -3,6 +3,8 @@ package com.mrzabbah.mytracker.feature_book_tracker.presentation.common
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -27,9 +29,10 @@ fun ImageDisplayer(
 ) {
     val o = LocalContext.current.resources
     val imageBitmap =
-            book.bitmapByteArray?.let {
-            BitmapFactory.decodeByteArray(book.bitmapByteArray,0, it.size).asImageBitmap()
-        } ?: BitmapFactory.decodeResource(o, com.mrzabbah.mytracker.R.drawable.non_available).asImageBitmap()
+        book.bitmapByteArray?.let {
+            BitmapFactory.decodeByteArray(book.bitmapByteArray, 0, it.size).asImageBitmap()
+        } ?: BitmapFactory.decodeResource(o, com.mrzabbah.mytracker.R.drawable.non_available)
+            .asImageBitmap()
 
     Image(
         bitmap = imageBitmap,
@@ -83,7 +86,7 @@ fun BookInfoItem(
             //Spacer(modifier = Modifier.height(4.dp))
             val author = book.authors ?: listOf("Unknown")
             Text(
-                text = "Author: ${author[0]}" ,
+                text = "Author: ${author[0]}",
                 style = MaterialTheme.typography.subtitle2,
                 color = Gray,
                 maxLines = 1,

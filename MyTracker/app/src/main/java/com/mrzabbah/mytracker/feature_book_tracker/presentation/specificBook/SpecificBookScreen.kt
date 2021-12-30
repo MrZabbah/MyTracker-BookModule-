@@ -73,7 +73,7 @@ fun SpecificBookScreen(
                         )
                     }
                 }
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(4.dp))
                 AnimatedVisibility(
                     visible = state.isFilterLabelToggled,
                     enter = fadeIn() + slideInVertically(),
@@ -143,19 +143,24 @@ fun SpecificBookScreen(
                                 }
                             )
                         }
+                        Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
-                Spacer(modifier = Modifier.height(8.dp))
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
                 ) {
-                    ImageDisplayer(book = state.book ?: Book(""))
+                    ImageDisplayer(
+                        book = state.book ?: Book(""),
+                        modifier = Modifier
+                            .height(192.dp)
+                            .width(144.dp)
+                    )
                     Column() {
                         Text(
                             text = state.book?.title ?: "",
-                            style = MaterialTheme.typography.h6
+                            style = MaterialTheme.typography.h5
                         )
                         Text(
                             text = state.book?.authors?.get(0) ?: "",
