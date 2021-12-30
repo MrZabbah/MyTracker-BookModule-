@@ -276,8 +276,11 @@ fun SpecificBookScreen(
                                 modifier = Modifier
                                     .weight(1f),
                                 colors = ButtonDefaults.buttonColors(
-                                    backgroundColor = CasualBlue
-                                )
+                                    backgroundColor = state.book.lastReadTimestamp?.let { LightGray }
+                                        ?: CasualBlue
+                                ),
+                                enabled = state.book.lastReadTimestamp?.let { false }
+                                    ?: true
                             ) {
                                 Text(
                                     text = "Set current page",
