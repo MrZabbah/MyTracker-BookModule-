@@ -4,6 +4,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Delete
@@ -19,6 +20,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.mrzabbah.mytracker.feature_book_tracker.domain.model.Book
+import com.mrzabbah.mytracker.ui.theme.DarkGray
 import com.mrzabbah.mytracker.ui.theme.LightBlue
 import com.mrzabbah.mytracker.ui.theme.LightGray
 

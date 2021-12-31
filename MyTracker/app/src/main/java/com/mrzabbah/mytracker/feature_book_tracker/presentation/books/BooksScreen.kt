@@ -1,39 +1,33 @@
 package com.mrzabbah.mytracker.feature_book_tracker.presentation.books
 
 import androidx.compose.animation.*
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusManager
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.mrzabbah.mytracker.feature_book_tracker.presentation.common.BookItem
+import com.mrzabbah.mytracker.feature_book_tracker.domain.model.Book
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.books.components.FilterSection
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.books.components.OrderSection
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.common.DefaultSearchBar
+import com.mrzabbah.mytracker.feature_book_tracker.presentation.common.components.BookListComposable
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.util.Screen
 import com.mrzabbah.mytracker.ui.theme.CasualBlue
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
+import com.mrzabbah.mytracker.ui.theme.LightGray
 import kotlinx.coroutines.launch
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 
 @ExperimentalComposeUiApi
 @ExperimentalAnimationApi
@@ -70,6 +64,29 @@ fun BooksScreen(
                     viewModel.onEvent(BooksEvent.ChangeSearchMode)
                 }
             )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "Reading",
+                style = MaterialTheme.typography.h4
+            )
+            Spacer(Modifier.height(8.dp))
+            BookListComposable(
+                books = state.readingBooks,
+                focusManager = focusManager,
+                navController = navController,
+                onBookAction = { book ->
+                    focusManager.clearFocus()
+                    viewModel.onEvent(BooksEvent.DeleteUserBook(book))
+                    scope.launch {
+                        val result = scaffoldState.snackbarHostState.showSnackbar(
+                            message = "\"${book.title}\" has been deleted",
+                            actionLabel = "Undo"
+                        )
+                        if (result == SnackbarResult.ActionPerformed)
+                            viewModel.onEvent(BooksEvent.RestoreUserBook)
+                    }
+                }
+            )
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -88,7 +105,8 @@ fun BooksScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Sort,
-                        contentDescription = "Sort"
+                        contentDescription = "Sort",
+                        tint = if (state.isUserOptionSectionVisible) CasualBlue else LightGray
                     )
                 }
                 IconButton(
@@ -99,7 +117,8 @@ fun BooksScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.FilterAlt,
-                        contentDescription = "Filter"
+                        contentDescription = "Filter",
+                        tint = if (state.isFilterSectionVisible) CasualBlue else LightGray
                     )
                 }
             }
@@ -112,7 +131,7 @@ fun BooksScreen(
                     OrderSection(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 16.dp),
+                            .padding(vertical = 4.dp),
                         bookOrder = state.bookOrder,
                         onOrderChange = {
                             viewModel.onEvent(BooksEvent.Order(it))
@@ -123,8 +142,7 @@ fun BooksScreen(
                 if (state.isFilterSectionVisible) {
                     FilterSection(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 16.dp),
+                            .fillMaxWidth(),
                         authorFilter = state.isAuthorFilterActive,
                         labelFilter = state.isLabelFilterActive,
                         labelsSelected = state.labelsSelected,
@@ -141,45 +159,24 @@ fun BooksScreen(
                     )
                 }
             }
-            Spacer(Modifier.height(16.dp))
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(state.books) { book ->
-                    BookItem(
-                        book = book,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                focusManager.clearFocus()
-                                navController.navigate(
-                                    Screen.SpecificBookScreen.route +
-                                            "/${
-                                                URLEncoder.encode(
-                                                    Json.encodeToString(book),
-                                                    StandardCharsets.UTF_8.toString()
-                                                )
-                                            }"
-                                )
-                            },
-                        onButtonOptionClick = {
-                            focusManager.clearFocus()
-                            viewModel.onEvent(BooksEvent.DeleteUserBook(book))
-                            scope.launch {
-                                val result = scaffoldState.snackbarHostState.showSnackbar(
-                                    message = "\"${book.title}\" has been deleted",
-                                    actionLabel = "Undo"
-                                )
-                                if (result == SnackbarResult.ActionPerformed)
-                                    viewModel.onEvent(BooksEvent.RestoreUserBook)
-                            }
-                        },
-                        buttonIcon = Icons.Default.Delete,
-                        buttonDescription = "Delete user book"
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
+            Spacer(Modifier.height(8.dp))
+            BookListComposable(
+                books = state.yourBooks,
+                focusManager = focusManager,
+                navController = navController,
+                onBookAction = { book ->
+                    focusManager.clearFocus()
+                    viewModel.onEvent(BooksEvent.DeleteUserBook(book))
+                    scope.launch {
+                        val result = scaffoldState.snackbarHostState.showSnackbar(
+                            message = "\"${book.title}\" has been deleted",
+                            actionLabel = "Undo"
+                        )
+                        if (result == SnackbarResult.ActionPerformed)
+                            viewModel.onEvent(BooksEvent.RestoreUserBook)
+                    }
                 }
-            }
+            )
         }
     }
 }

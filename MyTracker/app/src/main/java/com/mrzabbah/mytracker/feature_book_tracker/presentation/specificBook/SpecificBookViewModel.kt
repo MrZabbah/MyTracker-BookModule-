@@ -82,6 +82,12 @@ class SpecificBookViewModel @Inject constructor(
                     updatedBook?.let { updateBook(it) }
                 }
             }
+            SpecificBookEvent.ToggleActive -> {
+                val updatedBook = state.value.book?.copy(
+                    active = state.value.book?.let { !it.active } ?: false
+                )
+                updatedBook?.let { updateBook(it) }
+            }
         }
     }
 

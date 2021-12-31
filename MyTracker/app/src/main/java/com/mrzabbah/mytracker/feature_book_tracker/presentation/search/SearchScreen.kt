@@ -130,7 +130,7 @@ fun SearchScreen(
 @Composable
 fun test() {
     Icon(
-        imageVector = Icons.Filled.ArrowBack,
+        imageVector = Icons.Filled.MenuBook,
         contentDescription = "",
         tint = Color(Book.nonLabelColor)
     )

@@ -201,7 +201,8 @@ class BooksViewModel @Inject constructor(
         getUserBooksJob = bookTrackerUseCases.getUserBooksUseCase(bookOrder, author, labels)
             .onEach { books ->
                 _state.value = state.value.copy(
-                    books = books,
+                    readingBooks = books.filter { it.active },
+                    yourBooks = books.filter { !it.active },
                     bookOrder = bookOrder,
                     authorSelected = author,
                     labelsSelected = labels

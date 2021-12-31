@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
+import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -50,7 +51,6 @@ fun SpecificBookScreen(
     val state = viewModel.state.value
     val scaffoldState = rememberScaffoldState()
     val scrollState = rememberScrollState()
-    val interactionSource = remember { MutableInteractionSource() }
 
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
@@ -75,7 +75,11 @@ fun SpecificBookScreen(
                     .fillMaxWidth()
             ) {
 
-                Box(modifier = Modifier.fillMaxWidth()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding( vertical = 4.dp)
+                ) {
                     IconButton(
                         onClick = {
                             navController.navigateUp()
@@ -89,24 +93,37 @@ fun SpecificBookScreen(
                         )
                     }
                     if (state.book != null && state.book.addedTimestamp > 0) {
-                        IconButton(
-                            onClick = {
-                                viewModel.onEvent(SpecificBookEvent.ToggleLabelSection)
-                            },
+                        Row(
                             modifier = Modifier.align(alignment = Alignment.CenterEnd)
                         ) {
-                            Icon(
-                                imageVector = if (state.book.label == Book.nonLabelColor)
-                                    Icons.Filled.BookmarkBorder
-                                else
-                                    Icons.Filled.Bookmark,
-                                contentDescription = "Label",
-                                tint = Color(state.book.label)
-                            )
+                            IconButton(
+                                onClick = {
+                                    viewModel.onEvent(SpecificBookEvent.ToggleActive)
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.MenuBook,
+                                    contentDescription = "Active book",
+                                    tint = if (state.book.active) CasualBlue else LightGray
+                                )
+                            }
+                            IconButton(
+                                onClick = {
+                                    viewModel.onEvent(SpecificBookEvent.ToggleLabelSection)
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = if (state.book.label == Book.nonLabelColor)
+                                        Icons.Filled.BookmarkBorder
+                                    else
+                                        Icons.Filled.Bookmark,
+                                    contentDescription = "Label",
+                                    tint = Color(state.book.label)
+                                )
+                            }
                         }
                     }
                 }
-                Spacer(modifier = Modifier.height(4.dp))
                 AnimatedVisibility(
                     visible = state.isFilterLabelToggled,
                     enter = fadeIn() + slideInVertically(),
