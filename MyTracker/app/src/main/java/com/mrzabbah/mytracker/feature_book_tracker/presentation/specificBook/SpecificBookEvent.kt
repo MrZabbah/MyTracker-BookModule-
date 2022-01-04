@@ -6,4 +6,8 @@ sealed class SpecificBookEvent {
     object ClickReadButton: SpecificBookEvent()
     object TogglePagesDialog: SpecificBookEvent()
     object ToggleLabelSection: SpecificBookEvent()
+    object ToggleActive: SpecificBookEvent()
+    object ToggleMoreActions: SpecificBookEvent()
+    object ResetBookProgress: SpecificBookEvent()
+    object RestoreBookProgress: SpecificBookEvent()
 }

@@ -26,7 +26,8 @@ data class Book(
     val description: String? = null,
     var bitmapByteArray: ByteArray? = null,
     var addedTimestamp: Long = 0L,
-    val label: Int = nonLabelColor
+    val label: Int = nonLabelColor,
+    val active: Boolean = false
 ) {
     companion object {
         val nonLabelColor = LightGray.toArgb()

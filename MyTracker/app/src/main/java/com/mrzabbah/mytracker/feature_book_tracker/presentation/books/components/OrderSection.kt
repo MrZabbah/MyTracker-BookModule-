@@ -70,5 +70,6 @@ fun OrderSection(
                 }
             )
         }
+        Spacer(modifier = Modifier.height(4.dp))
     }
 }

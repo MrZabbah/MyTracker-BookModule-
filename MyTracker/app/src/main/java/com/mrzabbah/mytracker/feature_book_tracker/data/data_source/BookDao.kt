@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 interface BookDao {
 
     //@Query("SELECT * FROM book WHERE (CASE WHEN (authors IS NULL) THEN authors = authors ELSE authors = :author END) AND label IN (:labels)")
-    @Query("SELECT * FROM book WHERE :author IS :author AND label IN (:labels)")
+    @Query("SELECT * FROM book WHERE (:author IS :author AND label IN (:labels)) OR active IS 1")
     fun getUserBooks(author: String?, labels: List<Int>): Flow<List<Book>>
 
     @Query("SELECT * FROM book WHERE id = :id")

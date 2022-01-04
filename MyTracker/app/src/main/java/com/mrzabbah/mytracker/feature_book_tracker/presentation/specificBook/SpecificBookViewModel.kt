@@ -32,6 +32,8 @@ class SpecificBookViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
+    private var _lastBookProgress: Book? = null
+
     sealed class UiEvent {
         data class ShowSnackbar(val message: String) : UiEvent()
     }
@@ -81,6 +83,29 @@ class SpecificBookViewModel @Inject constructor(
                     )
                     updatedBook?.let { updateBook(it) }
                 }
+            }
+            SpecificBookEvent.ToggleActive -> {
+                val updatedBook = state.value.book?.copy(
+                    active = state.value.book?.let { !it.active } ?: false
+                )
+                updatedBook?.let { updateBook(it) }
+            }
+            SpecificBookEvent.ToggleMoreActions -> {
+                _state.value = state.value.copy(
+                    isMoreActionToggled = !state.value.isMoreActionToggled
+                )
+            }
+            SpecificBookEvent.ResetBookProgress -> {
+                _lastBookProgress = state.value.book?.copy()
+                val updatedBook = state.value.book?.copy(
+                    readTime = 0L,
+                    currentPage = 0
+                )
+                updatedBook?.let { updateBook(it) }
+            }
+            SpecificBookEvent.RestoreBookProgress -> {
+                _lastBookProgress?.let { updateBook(it) }
+                _lastBookProgress = null
             }
         }
     }
