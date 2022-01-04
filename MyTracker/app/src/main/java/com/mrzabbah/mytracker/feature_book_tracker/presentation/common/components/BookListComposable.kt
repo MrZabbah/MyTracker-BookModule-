@@ -29,33 +29,5 @@ fun BookListComposable(
     navController: NavController,
     onBookAction: (Book) -> Unit
 ) {
-    LazyColumn(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        items(books) { book ->
-            BookItem(
-                book = book,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        focusManager.clearFocus()
-                        navController.navigate(
-                            Screen.SpecificBookScreen.route +
-                                    "/${
-                                        URLEncoder.encode(
-                                            Json.encodeToString(book),
-                                            StandardCharsets.UTF_8.toString()
-                                        )
-                                    }"
-                        )
-                    },
-                onButtonOptionClick = {
-                    onBookAction(book)
-                },
-                buttonIcon = Icons.Default.Delete,
-                buttonDescription = "Delete user book"
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-    }
+
 }

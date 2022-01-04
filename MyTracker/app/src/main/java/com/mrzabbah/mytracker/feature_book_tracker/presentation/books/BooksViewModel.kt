@@ -193,6 +193,16 @@ class BooksViewModel @Inject constructor(
                     searchMode = newSearchMode
                 )
             }
+            BooksEvent.ToggleReadingBooksSection -> {
+                _state.value = state.value.copy(
+                    isReadingBooksDisplay = !state.value.isReadingBooksDisplay
+                )
+            }
+            BooksEvent.ToggleYourBooksSection -> {
+                _state.value = state.value.copy(
+                    isYourBooksDisplay = !state.value.isYourBooksDisplay
+                )
+            }
         }
     }
 

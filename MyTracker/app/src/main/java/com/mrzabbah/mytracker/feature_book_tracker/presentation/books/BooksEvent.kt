@@ -17,4 +17,6 @@ sealed class BooksEvent {
     object ToggleFilterSection: BooksEvent()
     object ToggleLabelFilter: BooksEvent()
     object ToggleAuthorFilter: BooksEvent()
+    object ToggleReadingBooksSection: BooksEvent()
+    object ToggleYourBooksSection: BooksEvent()
 }

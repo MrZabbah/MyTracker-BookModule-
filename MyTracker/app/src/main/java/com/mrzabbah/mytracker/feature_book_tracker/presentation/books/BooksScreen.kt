@@ -1,7 +1,10 @@
 package com.mrzabbah.mytracker.feature_book_tracker.presentation.books
 
 import androidx.compose.animation.*
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -22,12 +25,17 @@ import androidx.navigation.NavController
 import com.mrzabbah.mytracker.feature_book_tracker.domain.model.Book
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.books.components.FilterSection
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.books.components.OrderSection
+import com.mrzabbah.mytracker.feature_book_tracker.presentation.common.BookItem
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.common.DefaultSearchBar
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.common.components.BookListComposable
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.util.Screen
 import com.mrzabbah.mytracker.ui.theme.CasualBlue
 import com.mrzabbah.mytracker.ui.theme.LightGray
 import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 @ExperimentalComposeUiApi
 @ExperimentalAnimationApi
@@ -64,39 +72,96 @@ fun BooksScreen(
                     viewModel.onEvent(BooksEvent.ChangeSearchMode)
                 }
             )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = "Reading",
-                style = MaterialTheme.typography.h4
-            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(
+                    onClick = {
+                        viewModel.onEvent(BooksEvent.ToggleReadingBooksSection)
+                    },
+                ) {
+                    Icon(
+                        imageVector = if (state.isReadingBooksDisplay)
+                            Icons.Filled.ArrowDropUp
+                        else
+                            Icons.Filled.ArrowDropDown,
+                        contentDescription = "Show/Hide section"
+                    )
+                }
+                Text(
+                    text = "Reading",
+                    style = MaterialTheme.typography.h4
+                )
+            }
             Spacer(Modifier.height(8.dp))
-            BookListComposable(
-                books = state.readingBooks,
-                focusManager = focusManager,
-                navController = navController,
-                onBookAction = { book ->
-                    focusManager.clearFocus()
-                    viewModel.onEvent(BooksEvent.DeleteUserBook(book))
-                    scope.launch {
-                        val result = scaffoldState.snackbarHostState.showSnackbar(
-                            message = "\"${book.title}\" has been deleted",
-                            actionLabel = "Undo"
+            AnimatedVisibility(
+                visible = state.isReadingBooksDisplay,
+                enter = fadeIn() + slideInVertically(),
+                exit = fadeOut() + slideOutVertically()
+            ) {
+                LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                    items(state.readingBooks) { book ->
+                        BookItem(
+                            book = book,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    focusManager.clearFocus()
+                                    navController.navigate(
+                                        Screen.SpecificBookScreen.route +
+                                                "/${
+                                                    URLEncoder.encode(
+                                                        Json.encodeToString(book),
+                                                        StandardCharsets.UTF_8.toString()
+                                                    )
+                                                }"
+                                    )
+                                },
+                            onButtonOptionClick = {
+                                focusManager.clearFocus()
+                                viewModel.onEvent(BooksEvent.DeleteUserBook(book))
+                                scope.launch {
+                                    val result = scaffoldState.snackbarHostState.showSnackbar(
+                                        message = "\"${book.title}\" has been deleted",
+                                        actionLabel = "Undo"
+                                    )
+                                    if (result == SnackbarResult.ActionPerformed)
+                                        viewModel.onEvent(BooksEvent.RestoreUserBook)
+                                }
+                            },
+                            buttonIcon = Icons.Default.Delete,
+                            buttonDescription = "Delete user book"
                         )
-                        if (result == SnackbarResult.ActionPerformed)
-                            viewModel.onEvent(BooksEvent.RestoreUserBook)
+                        Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
-            )
+            }
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                IconButton(
+                    onClick = {
+                        viewModel.onEvent(BooksEvent.ToggleYourBooksSection)
+                    },
+                ) {
+                    Icon(
+                        imageVector = if (state.isYourBooksDisplay)
+                            Icons.Filled.ArrowDropUp
+                        else
+                            Icons.Filled.ArrowDropDown,
+                        contentDescription = "Show/Hide section"
+                    )
+                }
                 Text(
                     text = "Your books",
                     style = MaterialTheme.typography.h4
                 )
-                Spacer(modifier = Modifier.width(64.dp))
+                Spacer(modifier = Modifier.width(48.dp))
                 IconButton(
                     onClick = {
                         focusManager.clearFocus()
@@ -160,23 +225,48 @@ fun BooksScreen(
                 }
             }
             Spacer(Modifier.height(8.dp))
-            BookListComposable(
-                books = state.yourBooks,
-                focusManager = focusManager,
-                navController = navController,
-                onBookAction = { book ->
-                    focusManager.clearFocus()
-                    viewModel.onEvent(BooksEvent.DeleteUserBook(book))
-                    scope.launch {
-                        val result = scaffoldState.snackbarHostState.showSnackbar(
-                            message = "\"${book.title}\" has been deleted",
-                            actionLabel = "Undo"
+            AnimatedVisibility(
+                visible = state.isYourBooksDisplay,
+                enter = fadeIn() + slideInVertically(),
+                exit = fadeOut() + slideOutVertically()
+            ) {
+                LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                    items(state.yourBooks) { book ->
+                        BookItem(
+                            book = book,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    focusManager.clearFocus()
+                                    navController.navigate(
+                                        Screen.SpecificBookScreen.route +
+                                                "/${
+                                                    URLEncoder.encode(
+                                                        Json.encodeToString(book),
+                                                        StandardCharsets.UTF_8.toString()
+                                                    )
+                                                }"
+                                    )
+                                },
+                            onButtonOptionClick = {
+                                focusManager.clearFocus()
+                                viewModel.onEvent(BooksEvent.DeleteUserBook(book))
+                                scope.launch {
+                                    val result = scaffoldState.snackbarHostState.showSnackbar(
+                                        message = "\"${book.title}\" has been deleted",
+                                        actionLabel = "Undo"
+                                    )
+                                    if (result == SnackbarResult.ActionPerformed)
+                                        viewModel.onEvent(BooksEvent.RestoreUserBook)
+                                }
+                            },
+                            buttonIcon = Icons.Default.Delete,
+                            buttonDescription = "Delete user book"
                         )
-                        if (result == SnackbarResult.ActionPerformed)
-                            viewModel.onEvent(BooksEvent.RestoreUserBook)
+                        Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
-            )
+            }
         }
     }
 }

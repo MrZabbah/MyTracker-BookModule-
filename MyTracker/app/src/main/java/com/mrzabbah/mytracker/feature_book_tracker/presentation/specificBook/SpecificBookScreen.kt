@@ -10,14 +10,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.BookmarkBorder
-import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -32,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mrzabbah.mytracker.feature_book_tracker.domain.model.Book
+import com.mrzabbah.mytracker.feature_book_tracker.presentation.books.BooksEvent
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.books.components.DefaultCheckBox
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.common.ImageDisplayer
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.specificBook.components.CircularProgressBar
@@ -39,6 +38,7 @@ import com.mrzabbah.mytracker.feature_book_tracker.presentation.specificBook.com
 import com.mrzabbah.mytracker.feature_book_tracker.presentation.specificBook.components.DefaultInfoDisplayer
 import com.mrzabbah.mytracker.ui.theme.*
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @ExperimentalComposeUiApi
 @ExperimentalAnimationApi
@@ -51,6 +51,7 @@ fun SpecificBookScreen(
     val state = viewModel.state.value
     val scaffoldState = rememberScaffoldState()
     val scrollState = rememberScrollState()
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
@@ -78,7 +79,7 @@ fun SpecificBookScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding( vertical = 4.dp)
+                        .padding(vertical = 4.dp)
                 ) {
                     IconButton(
                         onClick = {
@@ -120,6 +121,57 @@ fun SpecificBookScreen(
                                     contentDescription = "Label",
                                     tint = Color(state.book.label)
                                 )
+                            }
+                            Column() {
+                                IconButton(
+                                    onClick = {
+                                        viewModel.onEvent(SpecificBookEvent.ToggleMoreActions)
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.MoreVert,
+                                        contentDescription = "More options",
+                                        tint = LightGray
+                                    )
+                                }
+                                DropdownMenu(
+                                    expanded = state.isMoreActionToggled,
+                                    onDismissRequest = {
+                                        viewModel.onEvent(SpecificBookEvent.ToggleMoreActions)
+                                    },
+                                    modifier = Modifier
+                                        .background(color = Gray)
+                                ) {
+                                    DropdownMenuItem(
+                                        onClick = {
+                                            if (state.book.lastReadTimestamp != null) {
+                                                scope.launch {
+                                                    scaffoldState.snackbarHostState.showSnackbar(
+                                                        message = "Book is being used. Try to reset later"
+                                                    )
+                                                }
+                                            } else {
+                                                viewModel.onEvent(SpecificBookEvent.ResetBookProgress)
+                                                scope.launch {
+                                                    val result =
+                                                        scaffoldState.snackbarHostState.showSnackbar(
+                                                            message = "Proggress has been reseted",
+                                                            actionLabel = "Undo"
+                                                        )
+                                                    if (result == SnackbarResult.ActionPerformed)
+                                                        viewModel.onEvent(SpecificBookEvent.RestoreBookProgress)
+                                                }
+                                            }
+                                            viewModel.onEvent(SpecificBookEvent.ToggleMoreActions)
+                                        }
+                                    ) {
+                                        Text(
+                                            "Reset progress",
+                                            color = Color.White,
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
+                                }
                             }
                         }
                     }

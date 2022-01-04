@@ -14,6 +14,8 @@ data class BooksState(
     val authorSelected: String? = null,
     val labelsSelected: List<Int> = Book.bookLabels,
     val isUserOptionSectionVisible: Boolean = false,
+    val isReadingBooksDisplay: Boolean = true,
+    val isYourBooksDisplay: Boolean = true,
     val isFilterSectionVisible: Boolean = false,
     val isAuthorFilterActive: Boolean = false,
     val isLabelFilterActive: Boolean = false

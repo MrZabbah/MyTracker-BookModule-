@@ -6,5 +6,6 @@ data class SpecificBookState(
     val isLoading: Boolean = false,
     val book: Book? = null,
     val isFilterLabelToggled: Boolean = false,
-    val isDialogToggled: Boolean = false
+    val isDialogToggled: Boolean = false,
+    val isMoreActionToggled: Boolean = false
 )
