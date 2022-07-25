@@ -2,7 +2,7 @@
 ![https://timestamptracker.com](https://raw.githubusercontent.com/mrzabbah/mrzabbah/master/timestamp_tracker_banner.jpg)
 
 Timestamp Tracker es una App para Android desarrollada con el fin de proporcionar a sus usuarios una **biblioteca personal
-sencilla e intuitiva**, siguiendo una interfaz similiar a [Google Play Books](https://play.google.com/books). Con ella, se 
+sencilla e intuitiva**, siguiendo una interfaz similar a [Google Play Books](https://play.google.com/books). Con ella, se 
 podrá guardar y gestionar cualquier libro que se desee, añadir tiempo de lectura en tiempo real, definir marcapáginas, 
 clasificar volúmenes, y más.
 
