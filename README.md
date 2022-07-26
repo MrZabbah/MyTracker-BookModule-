@@ -17,6 +17,7 @@ y en el uso de diversas librerías y paquetes propios del medio.
 [![Android](https://img.shields.io/badge/Android-5-cf3065.svg?longCache=true&style=flat-square)](https://www.android.com)
 
 * Con abrir y ejecutar el proyecto desde Android Studio es suficiente.
+* El APK se podrá descargar directamente desde la Release correspondiente.
 * [Puedes ver una explicación académica en detalle en esta presentación en Youtube](https://youtu.be/fK7vCTGFiRM)
 
 <a href="https://youtu.be/fK7vCTGFiRM"><img src="http://i3.ytimg.com/vi/fK7vCTGFiRM/maxresdefault.jpg" style="height: 50%; 
